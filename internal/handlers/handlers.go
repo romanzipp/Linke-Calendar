@@ -172,22 +172,29 @@ func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	berlin, err := time.LoadLocation("Europe/Berlin")
+	if err != nil {
+		log.Printf("Failed to load Berlin timezone: %v", err)
+		berlin = time.UTC
+	}
+
 	cal := ics.NewCalendar()
 	cal.SetMethod(ics.MethodPublish)
 	cal.SetName(site.Name)
 	cal.SetDescription(fmt.Sprintf("Events calendar for %s", site.Name))
 	cal.SetXPublishedTTL("PT1H")
+	cal.SetTimezoneId("Europe/Berlin")
 
 	for _, event := range events {
 		icalEvent := cal.AddEvent(fmt.Sprintf("%s-%d@linke-calendar", siteID, event.ID))
 		icalEvent.SetCreatedTime(event.CreatedAt)
 		icalEvent.SetModifiedAt(event.UpdatedAt)
-		icalEvent.SetStartAt(event.DatetimeStart)
+		icalEvent.SetStartAt(reinterpretTimeInLocation(event.DatetimeStart, berlin))
 
 		if event.DatetimeEnd.Valid {
-			icalEvent.SetEndAt(event.DatetimeEnd.Time)
+			icalEvent.SetEndAt(reinterpretTimeInLocation(event.DatetimeEnd.Time, berlin))
 		} else {
-			icalEvent.SetEndAt(event.DatetimeStart.Add(1 * time.Hour))
+			icalEvent.SetEndAt(reinterpretTimeInLocation(event.DatetimeStart, berlin).Add(1 * time.Hour))
 		}
 
 		icalEvent.SetSummary(event.Title)
@@ -212,4 +219,8 @@ func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Failed to serialize iCal: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
+}
+
+func reinterpretTimeInLocation(t time.Time, loc *time.Location) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), loc)
 }
