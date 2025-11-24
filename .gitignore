@@ -36,3 +36,6 @@ config.yaml
 # Node
 node_modules/
 package-lock.json
+
+zetkin.json
+zetkin.txt
