@@ -2,7 +2,14 @@
 
 Ein Go Webserver, der Termine eines Typo3 Frontend scraped und als `<iframe>` einbettbare Seite bereitstellt.
 
-![](/art/preview.png)
+## Funktionen
+
+- Anbindung an Typo3 DAS LINKE CMS der KVs/LVs (Server holt sich Termininformationen alle 60 Minuten)
+- Anbindung an Zetkin inklusive Filterung nach KV/LV ("Organisation")
+- Einbettung des Kalenders via `<iframe>` in die Website
+- Stellt iCal-Link zur Verfügung, womit der Kalender in mobilen Kalender-Apps abonniert werden kann
+
+![Vorschau Screenshot](/art/preview.png)
 
 ## Configuration
 
