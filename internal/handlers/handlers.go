@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	ics "github.com/arran4/golang-ical"
 	"github.com/go-chi/chi/v5"
 	"github.com/romanzipp/linke-calendar/internal/calendar"
 	"github.com/romanzipp/linke-calendar/internal/config"
@@ -149,6 +151,65 @@ func (h *Handler) EventDetail(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.templates.ExecuteTemplate(w, "event-modal", data); err != nil {
 		log.Printf("Failed to render event modal: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
+}
+
+func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
+	siteID := chi.URLParam(r, "siteID")
+
+	site, err := h.db.GetSite(siteID)
+	if err != nil {
+		log.Printf("Failed to get site %s: %v", siteID, err)
+		http.Error(w, "Site not found", http.StatusNotFound)
+		return
+	}
+
+	events, err := h.db.GetEventsBySite(siteID)
+	if err != nil {
+		log.Printf("Failed to get events for site %s: %v", siteID, err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	cal := ics.NewCalendar()
+	cal.SetMethod(ics.MethodPublish)
+	cal.SetName(site.Name)
+	cal.SetDescription(fmt.Sprintf("Events calendar for %s", site.Name))
+	cal.SetXPublishedTTL("PT1H")
+
+	for _, event := range events {
+		icalEvent := cal.AddEvent(fmt.Sprintf("%s-%d@linke-calendar", siteID, event.ID))
+		icalEvent.SetCreatedTime(event.CreatedAt)
+		icalEvent.SetModifiedAt(event.UpdatedAt)
+		icalEvent.SetStartAt(event.DatetimeStart)
+
+		if event.DatetimeEnd.Valid {
+			icalEvent.SetEndAt(event.DatetimeEnd.Time)
+		} else {
+			icalEvent.SetEndAt(event.DatetimeStart.Add(1 * time.Hour))
+		}
+
+		icalEvent.SetSummary(event.Title)
+
+		if event.Description.Valid {
+			icalEvent.SetDescription(event.Description.String)
+		}
+
+		if event.Location.Valid {
+			icalEvent.SetLocation(event.Location.String)
+		}
+
+		if event.URL != "" {
+			icalEvent.SetURL(event.URL)
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/calendar; charset=utf-8")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.ics\"", siteID))
+
+	if err := cal.SerializeTo(w); err != nil {
+		log.Printf("Failed to serialize iCal: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}
 }

@@ -59,6 +59,7 @@ func main() {
 
 	r.Get("/health", h.Health)
 	r.Get("/cal/{siteID}", h.Calendar)
+	r.Get("/cal/{siteID}/ical", h.ICalendar)
 	r.Get("/event/{eventID}", h.EventDetail)
 
 	fileServer := http.FileServer(http.Dir("web/static"))
