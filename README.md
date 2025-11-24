@@ -2,6 +2,8 @@
 
 Ein Go Webserver, der Termine eines Typo3 Frontend scraped und als `<iframe>` einbettbare Seite bereitstellt.
 
+![](/art/preview.png)
+
 ## Configuration
 
 Create a `config.yaml` file based on `config.yaml.example`:
