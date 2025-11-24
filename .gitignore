@@ -30,3 +30,5 @@ config.yaml
 /build/
 
 *.md
+!README.md
+!LICENSE.md

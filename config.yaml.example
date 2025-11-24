@@ -1,10 +1,7 @@
 sites:
   - id: "fulda"
     name: "Die Linke Fulda"
-    url: "https://www.die-linke-fulda.de/termine/?page={page}"
-  - id: "hessen"
-    name: "Die Linke Hessen"
-    url: "https://die-linke-hessen.de/termine/?page={page}"
+    url: "https://www.die-linke-fulda.de/termine/seite/{page}/"
 
 scraper:
   interval: "6h"
