@@ -226,7 +226,12 @@ func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 		icalEvent.SetStartAt(reinterpretTimeInLocation(event.DatetimeStart, berlin))
 
 		if event.DatetimeEnd.Valid {
-			icalEvent.SetEndAt(reinterpretTimeInLocation(event.DatetimeEnd.Time, berlin))
+			duration := event.DatetimeEnd.Time.Sub(event.DatetimeStart)
+			if duration > 4*24*time.Hour {
+				icalEvent.SetEndAt(reinterpretTimeInLocation(event.DatetimeStart, berlin).Add(1 * time.Hour))
+			} else {
+				icalEvent.SetEndAt(reinterpretTimeInLocation(event.DatetimeEnd.Time, berlin))
+			}
 		} else {
 			icalEvent.SetEndAt(reinterpretTimeInLocation(event.DatetimeStart, berlin).Add(1 * time.Hour))
 		}
