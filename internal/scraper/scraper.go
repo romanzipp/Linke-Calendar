@@ -14,9 +14,9 @@ import (
 )
 
 type Scraper struct {
-	db      *database.DB
-	config  *config.Config
-	client  *http.Client
+	db     *database.DB
+	config *config.Config
+	client *http.Client
 }
 
 func New(db *database.DB, cfg *config.Config) *Scraper {
@@ -54,10 +54,10 @@ func (s *Scraper) ScrapeSite(site config.Site) error {
 		return fmt.Errorf("failed to upsert site: %w", err)
 	}
 
-	maxPages := s.config.GetScraperMaxPages()
+	maxPages := s.config.GetScraperMaxPages() + 1
 	totalEvents := 0
 
-	for page := 0; page < maxPages; page++ {
+	for page := 1; page < maxPages; page++ {
 		pageURL := s.buildPageURL(site.URL, page)
 		log.Printf("Fetching page %d: %s", page, pageURL)
 
