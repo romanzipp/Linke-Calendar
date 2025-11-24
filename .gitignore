@@ -1,1 +1,33 @@
 *.html
+
+# Binaries
+/linke-calendar
+/cmd/server/server
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Config (ignore local, keep example)
+config.yaml
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+/dist/
+/build/
+
+*.md

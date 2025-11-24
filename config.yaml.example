@@ -1,0 +1,16 @@
+sites:
+  - id: "fulda"
+    name: "Die Linke Fulda"
+    url: "https://www.die-linke-fulda.de/termine/?page={page}"
+  - id: "hessen"
+    name: "Die Linke Hessen"
+    url: "https://die-linke-hessen.de/termine/?page={page}"
+
+scraper:
+  interval: "6h"
+  max_pages: 10
+  timeout: "30s"
+
+server:
+  port: "8080"
+  host: "0.0.0.0"
