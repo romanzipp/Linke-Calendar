@@ -1,0 +1,16 @@
+.git
+.gitignore
+*.md
+*.db
+*.sqlite
+*.sqlite3
+.DS_Store
+.idea
+.vscode
+*.swp
+*.swo
+*~
+Dockerfile
+docker-compose.yml
+config.yaml
+sample.html

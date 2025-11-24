@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  calendar:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - calendar-data:/app/data
+    environment:
+      - CONFIG_PATH=/app/config.yaml
+      - DB_PATH=/app/data/calendar.db
+    restart: unless-stopped
+
+volumes:
+  calendar-data:
