@@ -47,8 +47,8 @@
                      hx-get="/event/{{.ID}}"
                      hx-target="#modal-container"
                      hx-swap="innerHTML">
-                    <div class="font-medium truncate">{{.DatetimeStart.Format "15:04"}}</div>
-                    <div class="truncate">{{.Title}}</div>
+                    <div class="font-semibold text-ellipsis overflow-hidden">{{.Title}}</div>
+                    <div class="mt-1">{{.DatetimeStart.Format "15:04"}}</div>
                 </div>
                 {{end}}
             </div>
