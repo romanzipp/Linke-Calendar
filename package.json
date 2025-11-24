@@ -1,0 +1,16 @@
+{
+  "name": "linke-calendar",
+  "version": "1.0.0",
+  "description": "Calendar for Typo3 events",
+  "scripts": {
+    "build:css": "tailwindcss -i ./web/static/css/input.css -o ./web/static/css/style.css --minify",
+    "watch:css": "tailwindcss -i ./web/static/css/input.css -o ./web/static/css/style.css --watch",
+    "postinstall": "cp node_modules/htmx.org/dist/htmx.min.js web/static/js/"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  },
+  "dependencies": {
+    "htmx.org": "^1.9.10"
+  }
+}

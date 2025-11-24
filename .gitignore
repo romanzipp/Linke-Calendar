@@ -32,3 +32,7 @@ config.yaml
 *.md
 !README.md
 !LICENSE.md
+
+# Node
+node_modules/
+package-lock.json
