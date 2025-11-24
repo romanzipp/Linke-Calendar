@@ -169,15 +169,17 @@ func (s *Scraper) scrapeZetkin(site config.Site) int {
 			description += "Kontakt: " + event.Contact.Name
 		}
 
+		eventURL := fmt.Sprintf("https://app.zetkin.die-linke.de/o/%d/events/%d", event.Organization.ID, event.ID)
+
 		dbEvent := &database.Event{
 			SiteID:        site.ID,
 			Title:         event.Title,
 			Description:   toNullString(description),
 			DatetimeStart: startTime,
 			DatetimeEnd:   sql.NullTime{Time: endTime, Valid: true},
-			URL:           event.URL,
+			URL:           eventURL,
 			Location:      toNullString(location),
-			Typo3URL:      toNullString(event.URL),
+			Typo3URL:      toNullString(eventURL),
 		}
 
 		if err := s.db.UpsertEvent(dbEvent); err != nil {
