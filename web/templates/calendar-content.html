@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-6">
         <a href="/site/{{.Site.ID}}/calendar?year={{.PrevYear}}&month={{.PrevMonth}}"
            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-           hx-get="/cal/{{.Site.ID}}?year={{.PrevYear}}&month={{.PrevMonth}}"
+           hx-get="/site/{{.Site.ID}}/calendar?year={{.PrevYear}}&month={{.PrevMonth}}"
            hx-target="#calendar-content"
            hx-swap="outerHTML"
            hx-push-url="true">
@@ -16,7 +16,7 @@
 
         <a href="/site/{{.Site.ID}}/calendar?year={{.NextYear}}&month={{.NextMonth}}"
            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-           hx-get="/cal/{{.Site.ID}}?year={{.NextYear}}&month={{.NextMonth}}"
+           hx-get="/site/{{.Site.ID}}/calendar?year={{.NextYear}}&month={{.NextMonth}}"
            hx-target="#calendar-content"
            hx-swap="outerHTML"
            hx-push-url="true">
