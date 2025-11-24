@@ -111,6 +111,17 @@ func (db *DB) GetUpcomingEventsBySite(siteID string, limit int) ([]*Event, error
 	return db.queryEvents(query, siteID, limit)
 }
 
+func (db *DB) GetAllUpcomingEventsBySite(siteID string) ([]*Event, error) {
+	query := `
+		SELECT id, site_id, title, description, datetime_start, datetime_end,
+		       url, location, scraper, created_at, updated_at
+		FROM events
+		WHERE site_id = ? AND datetime_start >= datetime('now')
+		ORDER BY datetime_start ASC
+	`
+	return db.queryEvents(query, siteID)
+}
+
 func (db *DB) UpsertEvent(event *Event) error {
 	query := `
 		INSERT INTO events (

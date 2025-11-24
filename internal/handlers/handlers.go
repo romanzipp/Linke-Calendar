@@ -155,6 +155,37 @@ func (h *Handler) EventDetail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
+	siteID := chi.URLParam(r, "siteID")
+
+	site, err := h.db.GetSite(siteID)
+	if err != nil {
+		log.Printf("Failed to get site %s: %v", siteID, err)
+		http.Error(w, "Site not found", http.StatusNotFound)
+		return
+	}
+
+	events, err := h.db.GetAllUpcomingEventsBySite(siteID)
+	if err != nil {
+		log.Printf("Failed to get upcoming events: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Site   *database.Site
+		Events []*database.Event
+	}{
+		Site:   site,
+		Events: events,
+	}
+
+	if err := h.templates.ExecuteTemplate(w, "list.html", data); err != nil {
+		log.Printf("Failed to render list: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
+}
+
 func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 	siteID := chi.URLParam(r, "siteID")
 

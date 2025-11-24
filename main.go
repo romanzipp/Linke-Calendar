@@ -59,7 +59,7 @@ func main() {
 
 	r.Get("/health", h.Health)
 	r.Get("/site/{siteID}/calendar", h.Calendar)
-	r.Get("/site/{siteID}/list", h.Calendar)
+	r.Get("/site/{siteID}/list", h.List)
 	r.Get("/site/{siteID}/ical", h.ICalendar)
 	r.Get("/event/{eventID}", h.EventDetail)
 
