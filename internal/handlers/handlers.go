@@ -157,6 +157,7 @@ func (h *Handler) EventDetail(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	siteID := chi.URLParam(r, "siteID")
+	color := r.URL.Query().Get("color")
 
 	site, err := h.db.GetSite(siteID)
 	if err != nil {
@@ -175,9 +176,11 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Site   *database.Site
 		Events []*database.Event
+		Color  string
 	}{
 		Site:   site,
 		Events: events,
+		Color:  color,
 	}
 
 	if err := h.templates.ExecuteTemplate(w, "list.html", data); err != nil {
