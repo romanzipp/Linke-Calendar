@@ -2,7 +2,6 @@
 
 # Binaries
 /linke-calendar
-/cmd/server/server
 
 # Database
 *.db

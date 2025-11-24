@@ -130,10 +130,3 @@ func (s *Scraper) fetchPage(url string) (string, error) {
 func (s *Scraper) buildPageURL(urlTemplate string, page int) string {
 	return strings.ReplaceAll(urlTemplate, "{page}", fmt.Sprintf("%d", page))
 }
-
-func toNullString(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{Valid: false}
-	}
-	return sql.NullString{String: s, Valid: true}
-}
