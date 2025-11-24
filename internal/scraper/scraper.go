@@ -49,7 +49,7 @@ func (s *Scraper) ScrapeSite(site config.Site) error {
 
 	totalEvents := 0
 
-	if site.ZetkinEnabled {
+	if site.ZetkinOrganization > 0 {
 		zetkinEvents := s.scrapeZetkin(site)
 		totalEvents += zetkinEvents
 	}
@@ -63,23 +63,20 @@ func (s *Scraper) ScrapeSite(site config.Site) error {
 }
 
 func (s *Scraper) scrapeZetkin(site config.Site) int {
-	log.Printf("Fetching Zetkin events for organization: %s", site.ZetkinOrganization)
+	log.Printf("Fetching Zetkin events for organization ID: %d", site.ZetkinOrganization)
 
-	client := NewZetkinClient(site.ZetkinCookie, s.config.GetScraperTimeout())
+	client := NewZetkinClient(site.ZetkinOrganization, s.config.GetScraperTimeout())
 
-	allEvents, err := client.FetchAllEvents()
+	events, err := client.FetchAllEvents()
 	if err != nil {
 		log.Printf("Failed to fetch Zetkin events: %v", err)
 		return 0
 	}
 
-	log.Printf("Fetched %d total events from Zetkin", len(allEvents))
-
-	filteredEvents := client.FilterByOrganization(allEvents, site.ZetkinOrganization)
-	log.Printf("Filtered to %d events for organization %s", len(filteredEvents), site.ZetkinOrganization)
+	log.Printf("Fetched %d events from Zetkin for organization %d", len(events), site.ZetkinOrganization)
 
 	totalEvents := 0
-	for _, event := range filteredEvents {
+	for _, event := range events {
 		startTime, err := parseZetkinTime(event.StartTime)
 		if err != nil {
 			log.Printf("Failed to parse start time for event %s: %v", event.Title, err)

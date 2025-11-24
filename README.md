@@ -18,10 +18,8 @@ Create a `config.yaml` file based on `config.yaml.example`:
 sites:
   - id: "fulda"
     name: "Die Linke Fulda"
-    url: "https://www.die-linke-fulda.de/termine/seite/{page}/"
-    zetkin_enabled: true
-    zetkin_cookie: "Fe....645"
-    zetkin_organization: "KV Fulda"
+    url: "https://www.die-linke-fulda.de/"
+    zetkin_organization: 192
 
 scraper:
   interval: "6h"

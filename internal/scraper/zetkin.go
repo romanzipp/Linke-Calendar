@@ -1,7 +1,6 @@
 package scraper
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,20 +9,15 @@ import (
 	"time"
 )
 
-const zetkinAPIURL = "https://app.zetkin.die-linke.de/api/rpc"
+const zetkinAPIBaseURL = "https://api.zetkin.die-linke.de/v1/orgs"
 
 type ZetkinClient struct {
-	cookie string
+	orgID  int
 	client *http.Client
 }
 
-type ZetkinRequest struct {
-	Func   string                 `json:"func"`
-	Params map[string]interface{} `json:"params"`
-}
-
 type ZetkinResponse struct {
-	Result []ZetkinEvent `json:"result"`
+	Data []ZetkinEvent `json:"data"`
 }
 
 type ZetkinEvent struct {
@@ -62,9 +56,9 @@ type ZetkinOrganization struct {
 	Title string `json:"title"`
 }
 
-func NewZetkinClient(cookie string, timeout time.Duration) *ZetkinClient {
+func NewZetkinClient(orgID int, timeout time.Duration) *ZetkinClient {
 	return &ZetkinClient{
-		cookie: cookie,
+		orgID: orgID,
 		client: &http.Client{
 			Timeout: timeout,
 		},
@@ -72,25 +66,15 @@ func NewZetkinClient(cookie string, timeout time.Duration) *ZetkinClient {
 }
 
 func (z *ZetkinClient) FetchAllEvents() ([]ZetkinEvent, error) {
-	reqBody := ZetkinRequest{
-		Func:   "getAllEvents",
-		Params: map[string]interface{}{},
-	}
+	url := fmt.Sprintf("%s/%d/actions", zetkinAPIBaseURL, z.orgID)
 
-	jsonData, err := json.Marshal(reqBody)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
-	}
-
-	req, err := http.NewRequest("POST", zetkinAPIURL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0")
-	req.Header.Set("Accept", "*/*")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Cookie", fmt.Sprintf("zsid=%s", z.cookie))
+	req.Header.Set("Accept", "application/json")
 
 	resp, err := z.client.Do(req)
 	if err != nil {
@@ -118,17 +102,14 @@ func (z *ZetkinClient) FetchAllEvents() ([]ZetkinEvent, error) {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
-	return zetkinResp.Result, nil
-}
-
-func (z *ZetkinClient) FilterByOrganization(events []ZetkinEvent, organization string) []ZetkinEvent {
 	var filtered []ZetkinEvent
-	for _, event := range events {
-		if event.Organization.Title == organization && event.Cancelled == nil {
+	for _, event := range zetkinResp.Data {
+		if event.Cancelled == nil {
 			filtered = append(filtered, event)
 		}
 	}
-	return filtered
+
+	return filtered, nil
 }
 
 func parseZetkinTime(timeStr string) (time.Time, error) {
