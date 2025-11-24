@@ -107,6 +107,7 @@ func (s *Scraper) scrapeWebsite(site config.Site) int {
 				URL:           event.URL,
 				Location:      toNullString(event.Location),
 				Typo3URL:      toNullString(event.URL),
+				Scraper:       "website",
 			}
 
 			if err := s.db.UpsertEvent(dbEvent); err != nil {
@@ -180,6 +181,7 @@ func (s *Scraper) scrapeZetkin(site config.Site) int {
 			URL:           eventURL,
 			Location:      toNullString(location),
 			Typo3URL:      toNullString(eventURL),
+			Scraper:       "zetkin",
 		}
 
 		if err := s.db.UpsertEvent(dbEvent); err != nil {

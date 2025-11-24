@@ -44,6 +44,7 @@ func (db *DB) Initialize() error {
 		url TEXT NOT NULL UNIQUE,
 		location TEXT,
 		typo3_url TEXT,
+		scraper TEXT DEFAULT 'website',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (site_id) REFERENCES sites(id)
@@ -56,6 +57,11 @@ func (db *DB) Initialize() error {
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("failed to initialize schema: %w", err)
 	}
+
+	migrationSQL := `
+	ALTER TABLE events ADD COLUMN scraper TEXT DEFAULT 'website';
+	`
+	db.Exec(migrationSQL)
 
 	return nil
 }
