@@ -59,8 +59,18 @@
 }
 
 @layer base {
+  html {
+    overflow-x: hidden;
+  }
+
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  body::-webkit-scrollbar {
+      display: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
