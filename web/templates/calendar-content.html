@@ -1,0 +1,62 @@
+{{define "calendar-content"}}
+<div id="calendar-content">
+    <div class="flex items-center justify-between mb-6">
+        <a href="/cal/{{.Site.ID}}?year={{.PrevYear}}&month={{.PrevMonth}}"
+           class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+           hx-get="/cal/{{.Site.ID}}?year={{.PrevYear}}&month={{.PrevMonth}}"
+           hx-target="#calendar-content"
+           hx-swap="outerHTML"
+           hx-push-url="true">
+            &larr; Zurück
+        </a>
+
+        <h2 class="text-2xl font-semibold text-gray-800">
+            {{.Calendar.MonthName}} {{.Calendar.Year}}
+        </h2>
+
+        <a href="/cal/{{.Site.ID}}?year={{.NextYear}}&month={{.NextMonth}}"
+           class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+           hx-get="/cal/{{.Site.ID}}?year={{.NextYear}}&month={{.NextMonth}}"
+           hx-target="#calendar-content"
+           hx-swap="outerHTML"
+           hx-push-url="true">
+            Weiter &rarr;
+        </a>
+    </div>
+
+    <div class="calendar-grid">
+        <div class="grid grid-cols-7 gap-2 mb-2">
+            <div class="text-center font-semibold text-gray-700 py-2">Mo</div>
+            <div class="text-center font-semibold text-gray-700 py-2">Di</div>
+            <div class="text-center font-semibold text-gray-700 py-2">Mi</div>
+            <div class="text-center font-semibold text-gray-700 py-2">Do</div>
+            <div class="text-center font-semibold text-gray-700 py-2">Fr</div>
+            <div class="text-center font-semibold text-gray-700 py-2">Sa</div>
+            <div class="text-center font-semibold text-gray-700 py-2">So</div>
+        </div>
+
+    {{range .Calendar.Weeks}}
+    <div class="grid grid-cols-7 gap-2 mb-2">
+        {{range .Days}}
+        <div class="min-h-24 border rounded p-2 {{if not .InMonth}}bg-gray-100 text-gray-400{{else}}bg-white{{end}} {{if .IsToday}}ring-2 ring-red-600{{end}}">
+            <div class="text-sm font-semibold mb-1">{{.Day}}</div>
+            {{if .Events}}
+            <div class="space-y-1">
+                {{range .Events}}
+                <div class="text-xs bg-red-100 text-red-800 rounded px-2 py-1 cursor-pointer hover:bg-red-200 transition"
+                     hx-get="/event/{{.ID}}"
+                     hx-target="#modal-container"
+                     hx-swap="innerHTML">
+                    <div class="font-medium truncate">{{.DatetimeStart.Format "15:04"}}</div>
+                    <div class="truncate">{{.Title}}</div>
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+    {{end}}
+    </div>
+</div>
+{{end}}
