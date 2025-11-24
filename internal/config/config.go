@@ -25,7 +25,6 @@ type Site struct {
 
 type Scraper struct {
 	Interval string `yaml:"interval"`
-	MaxPages int    `yaml:"max_pages"`
 	Timeout  string `yaml:"timeout"`
 }
 
@@ -106,13 +105,6 @@ func (c *Config) GetScraperTimeout() time.Duration {
 	}
 	d, _ := time.ParseDuration(c.Scraper.Timeout)
 	return d
-}
-
-func (c *Config) GetScraperMaxPages() int {
-	if c.Scraper.MaxPages == 0 {
-		return 10
-	}
-	return c.Scraper.MaxPages
 }
 
 func (c *Config) GetServerAddress() string {

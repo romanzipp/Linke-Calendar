@@ -1,7 +1,7 @@
 {
   "name": "linke-calendar",
   "version": "1.0.0",
-  "description": "Calendar for Typo3 events",
+  "description": "Calendar for Zetkin events",
   "scripts": {
     "build:css": "tailwindcss -i ./web/static/css/input.css -o ./web/static/css/style.css --minify",
     "watch:css": "tailwindcss -i ./web/static/css/input.css -o ./web/static/css/style.css --watch",

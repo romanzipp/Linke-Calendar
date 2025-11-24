@@ -2,10 +2,12 @@ sites:
   - id: "fulda"
     name: "Die Linke Fulda"
     url: "https://www.die-linke-fulda.de/termine/seite/{page}/"
+    zetkin_enabled: true
+    zetkin_cookie: "your-zetkin-session-id"
+    zetkin_organization: "KV Fulda"
 
 scraper:
   interval: "6h"
-  max_pages: 10
   timeout: "30s"
 
 server:
