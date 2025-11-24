@@ -35,9 +35,10 @@ Zetkin: If enabled, provide the Zetkin Session ID (Cookie string after `zsid=`) 
 ## API Endpoints
 
 - `GET /health` - Health check endpoint
-- `GET /cal/{siteID}` - Calendar view for a specific site
+- `GET /site/{siteID}/calendar` - Calendar view for a specific site
   - Query params: `year`, `month` (optional)
-- `GET /cal/{siteID}/ical` - iCal endpoint for subscribing with mobile device
+- `GET /site/{siteID}/list` - List view for upcoming events
+- `GET /site/{siteID}/ical` - iCal endpoint for subscribing with mobile device
 - `GET /event/{eventID}` - Event detail modal
 - `GET /static/*` - Static files (CSS, JS, fonts)
 

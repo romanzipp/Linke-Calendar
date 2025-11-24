@@ -58,8 +58,9 @@ func main() {
 	r.Use(middleware.Compress(5))
 
 	r.Get("/health", h.Health)
-	r.Get("/cal/{siteID}", h.Calendar)
-	r.Get("/cal/{siteID}/ical", h.ICalendar)
+	r.Get("/site/{siteID}/calendar", h.Calendar)
+	r.Get("/site/{siteID}/list", h.Calendar)
+	r.Get("/site/{siteID}/ical", h.ICalendar)
 	r.Get("/event/{eventID}", h.EventDetail)
 
 	fileServer := http.FileServer(http.Dir("web/static"))
