@@ -43,7 +43,6 @@ func (db *DB) Initialize() error {
 		datetime_end DATETIME,
 		url TEXT NOT NULL UNIQUE,
 		location TEXT,
-		typo3_url TEXT,
 		scraper TEXT DEFAULT 'website',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

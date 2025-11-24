@@ -137,7 +137,6 @@ func (se *ScrapedEvent) ToDBEvent(siteID string) *Event {
 		DatetimeEnd:   sql.NullTime{},
 		URL:           se.URL,
 		Location:      toNullString(se.Location),
-		Typo3URL:      toNullString(se.URL),
 	}
 }
 
@@ -156,5 +155,4 @@ type Event struct {
 	DatetimeEnd   sql.NullTime
 	URL           string
 	Location      sql.NullString
-	Typo3URL      sql.NullString
 }

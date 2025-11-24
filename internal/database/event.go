@@ -15,7 +15,6 @@ type Event struct {
 	DatetimeEnd  sql.NullTime
 	URL          string
 	Location     sql.NullString
-	Typo3URL     sql.NullString
 	Scraper      string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -25,8 +24,8 @@ func (db *DB) CreateEvent(event *Event) error {
 	query := `
 		INSERT INTO events (
 			site_id, title, description, datetime_start, datetime_end,
-			url, location, typo3_url, scraper
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+			url, location, scraper
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`
 	result, err := db.Exec(
 		query,
@@ -37,7 +36,6 @@ func (db *DB) CreateEvent(event *Event) error {
 		event.DatetimeEnd,
 		event.URL,
 		event.Location,
-		event.Typo3URL,
 		event.Scraper,
 	)
 	if err != nil {
@@ -56,7 +54,7 @@ func (db *DB) CreateEvent(event *Event) error {
 func (db *DB) GetEvent(id int) (*Event, error) {
 	query := `
 		SELECT id, site_id, title, description, datetime_start, datetime_end,
-		       url, location, typo3_url, scraper, created_at, updated_at
+		       url, location, scraper, created_at, updated_at
 		FROM events WHERE id = ?
 	`
 	var event Event
@@ -69,7 +67,6 @@ func (db *DB) GetEvent(id int) (*Event, error) {
 		&event.DatetimeEnd,
 		&event.URL,
 		&event.Location,
-		&event.Typo3URL,
 		&event.Scraper,
 		&event.CreatedAt,
 		&event.UpdatedAt,
@@ -83,7 +80,7 @@ func (db *DB) GetEvent(id int) (*Event, error) {
 func (db *DB) GetEventsBySite(siteID string) ([]*Event, error) {
 	query := `
 		SELECT id, site_id, title, description, datetime_start, datetime_end,
-		       url, location, typo3_url, scraper, created_at, updated_at
+		       url, location, scraper, created_at, updated_at
 		FROM events
 		WHERE site_id = ?
 		ORDER BY datetime_start ASC
@@ -94,7 +91,7 @@ func (db *DB) GetEventsBySite(siteID string) ([]*Event, error) {
 func (db *DB) GetEventsBySiteInRange(siteID string, start, end time.Time) ([]*Event, error) {
 	query := `
 		SELECT id, site_id, title, description, datetime_start, datetime_end,
-		       url, location, typo3_url, scraper, created_at, updated_at
+		       url, location, scraper, created_at, updated_at
 		FROM events
 		WHERE site_id = ? AND datetime_start >= ? AND datetime_start < ?
 		ORDER BY datetime_start ASC
@@ -105,7 +102,7 @@ func (db *DB) GetEventsBySiteInRange(siteID string, start, end time.Time) ([]*Ev
 func (db *DB) GetUpcomingEventsBySite(siteID string, limit int) ([]*Event, error) {
 	query := `
 		SELECT id, site_id, title, description, datetime_start, datetime_end,
-		       url, location, typo3_url, scraper, created_at, updated_at
+		       url, location, scraper, created_at, updated_at
 		FROM events
 		WHERE site_id = ? AND datetime_start >= datetime('now')
 		ORDER BY datetime_start ASC
@@ -118,15 +115,14 @@ func (db *DB) UpsertEvent(event *Event) error {
 	query := `
 		INSERT INTO events (
 			site_id, title, description, datetime_start, datetime_end,
-			url, location, typo3_url, scraper
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+			url, location, scraper
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(url) DO UPDATE SET
 			title = excluded.title,
 			description = excluded.description,
 			datetime_start = excluded.datetime_start,
 			datetime_end = excluded.datetime_end,
 			location = excluded.location,
-			typo3_url = excluded.typo3_url,
 			scraper = excluded.scraper,
 			updated_at = CURRENT_TIMESTAMP
 	`
@@ -139,7 +135,6 @@ func (db *DB) UpsertEvent(event *Event) error {
 		event.DatetimeEnd,
 		event.URL,
 		event.Location,
-		event.Typo3URL,
 		event.Scraper,
 	)
 	if err != nil {
@@ -176,7 +171,6 @@ func (db *DB) queryEvents(query string, args ...interface{}) ([]*Event, error) {
 			&event.DatetimeEnd,
 			&event.URL,
 			&event.Location,
-			&event.Typo3URL,
 			&event.Scraper,
 			&event.CreatedAt,
 			&event.UpdatedAt,

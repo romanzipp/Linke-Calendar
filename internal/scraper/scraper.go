@@ -106,7 +106,6 @@ func (s *Scraper) scrapeWebsite(site config.Site) int {
 				DatetimeEnd:   sql.NullTime{},
 				URL:           event.URL,
 				Location:      toNullString(event.Location),
-				Typo3URL:      toNullString(event.URL),
 				Scraper:       "website",
 			}
 
@@ -180,7 +179,6 @@ func (s *Scraper) scrapeZetkin(site config.Site) int {
 			DatetimeEnd:   sql.NullTime{Time: endTime, Valid: true},
 			URL:           eventURL,
 			Location:      toNullString(location),
-			Typo3URL:      toNullString(eventURL),
 			Scraper:       "zetkin",
 		}
 
