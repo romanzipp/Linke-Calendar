@@ -13,6 +13,9 @@ sites:
   - id: "fulda"
     name: "Die Linke Fulda"
     url: "https://www.die-linke-fulda.de/termine/seite/{page}/"
+    zetkin_enabled: true
+    zetkin_cookie: "Fe....645"
+    zetkin_organization: "KV Fulda"
 
 scraper:
   interval: "6h"
@@ -23,6 +26,8 @@ server:
   port: "8080"
   host: "0.0.0.0"
 ```
+
+Zetkin: If enabled, provide the Zetkin Session ID (Cookie string after `zsid=`) and an organization name for filtering.
 
 ## API Endpoints
 

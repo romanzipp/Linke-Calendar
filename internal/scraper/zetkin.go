@@ -33,9 +33,16 @@ type ZetkinEvent struct {
 	EndTime      string             `json:"end_time"`
 	InfoText     string             `json:"info_text"`
 	URL          string             `json:"url"`
+	Activity     *ZetkinActivity    `json:"activity"`
 	Location     *ZetkinLocation    `json:"location"`
+	Contact      *ZetkinContact     `json:"contact"`
 	Organization ZetkinOrganization `json:"organization"`
 	Cancelled    *string            `json:"cancelled"`
+}
+
+type ZetkinActivity struct {
+	ID    int    `json:"id"`
+	Title string `json:"title"`
 }
 
 type ZetkinLocation struct {
@@ -43,6 +50,11 @@ type ZetkinLocation struct {
 	Lat   float64 `json:"lat"`
 	Lng   float64 `json:"lng"`
 	Title string  `json:"title"`
+}
+
+type ZetkinContact struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type ZetkinOrganization struct {

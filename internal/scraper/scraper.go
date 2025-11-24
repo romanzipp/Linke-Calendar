@@ -158,10 +158,21 @@ func (s *Scraper) scrapeZetkin(site config.Site) int {
 			location = event.Location.Title
 		}
 
+		description := event.InfoText
+		if description == "" && event.Activity != nil {
+			description = event.Activity.Title
+		}
+		if event.Contact != nil && event.Contact.Name != "" {
+			if description != "" {
+				description += "\n\n"
+			}
+			description += "Kontakt: " + event.Contact.Name
+		}
+
 		dbEvent := &database.Event{
 			SiteID:        site.ID,
 			Title:         event.Title,
-			Description:   toNullString(event.InfoText),
+			Description:   toNullString(description),
 			DatetimeStart: startTime,
 			DatetimeEnd:   sql.NullTime{Time: endTime, Valid: true},
 			URL:           event.URL,
