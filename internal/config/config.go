@@ -15,9 +15,12 @@ type Config struct {
 }
 
 type Site struct {
-	ID   string `yaml:"id"`
-	Name string `yaml:"name"`
-	URL  string `yaml:"url"`
+	ID                 string `yaml:"id"`
+	Name               string `yaml:"name"`
+	URL                string `yaml:"url"`
+	ZetkinEnabled      bool   `yaml:"zetkin_enabled"`
+	ZetkinCookie       string `yaml:"zetkin_cookie"`
+	ZetkinOrganization string `yaml:"zetkin_organization"`
 }
 
 type Scraper struct {
@@ -63,6 +66,14 @@ func (c *Config) validate() error {
 		}
 		if site.URL == "" {
 			return fmt.Errorf("site[%d]: url is required", i)
+		}
+		if site.ZetkinEnabled {
+			if site.ZetkinCookie == "" {
+				return fmt.Errorf("site[%d]: zetkin_cookie is required when zetkin_enabled is true", i)
+			}
+			if site.ZetkinOrganization == "" {
+				return fmt.Errorf("site[%d]: zetkin_organization is required when zetkin_enabled is true", i)
+			}
 		}
 	}
 

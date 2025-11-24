@@ -54,6 +54,25 @@ func (s *Scraper) ScrapeSite(site config.Site) error {
 		return fmt.Errorf("failed to upsert site: %w", err)
 	}
 
+	totalEvents := 0
+
+	websiteEvents := s.scrapeWebsite(site)
+	totalEvents += websiteEvents
+
+	if site.ZetkinEnabled {
+		zetkinEvents := s.scrapeZetkin(site)
+		totalEvents += zetkinEvents
+	}
+
+	if err := s.db.UpdateSiteLastScraped(site.ID, time.Now()); err != nil {
+		log.Printf("Failed to update last_scraped for site %s: %v", site.ID, err)
+	}
+
+	log.Printf("Scraped %d total events from site %s", totalEvents, site.ID)
+	return nil
+}
+
+func (s *Scraper) scrapeWebsite(site config.Site) int {
 	maxPages := s.config.GetScraperMaxPages() + 1
 	totalEvents := 0
 
@@ -100,12 +119,65 @@ func (s *Scraper) ScrapeSite(site config.Site) error {
 		time.Sleep(1 * time.Second)
 	}
 
-	if err := s.db.UpdateSiteLastScraped(site.ID, time.Now()); err != nil {
-		log.Printf("Failed to update last_scraped for site %s: %v", site.ID, err)
+	log.Printf("Scraped %d events from website for site %s", totalEvents, site.ID)
+	return totalEvents
+}
+
+func (s *Scraper) scrapeZetkin(site config.Site) int {
+	log.Printf("Fetching Zetkin events for organization: %s", site.ZetkinOrganization)
+
+	client := NewZetkinClient(site.ZetkinCookie, s.config.GetScraperTimeout())
+
+	allEvents, err := client.FetchAllEvents()
+	if err != nil {
+		log.Printf("Failed to fetch Zetkin events: %v", err)
+		return 0
 	}
 
-	log.Printf("Scraped %d events from site %s", totalEvents, site.ID)
-	return nil
+	log.Printf("Fetched %d total events from Zetkin", len(allEvents))
+
+	filteredEvents := client.FilterByOrganization(allEvents, site.ZetkinOrganization)
+	log.Printf("Filtered to %d events for organization %s", len(filteredEvents), site.ZetkinOrganization)
+
+	totalEvents := 0
+	for _, event := range filteredEvents {
+		startTime, err := parseZetkinTime(event.StartTime)
+		if err != nil {
+			log.Printf("Failed to parse start time for event %s: %v", event.Title, err)
+			continue
+		}
+
+		endTime, err := parseZetkinTime(event.EndTime)
+		if err != nil {
+			log.Printf("Failed to parse end time for event %s: %v", event.Title, err)
+			continue
+		}
+
+		location := ""
+		if event.Location != nil {
+			location = event.Location.Title
+		}
+
+		dbEvent := &database.Event{
+			SiteID:        site.ID,
+			Title:         event.Title,
+			Description:   toNullString(event.InfoText),
+			DatetimeStart: startTime,
+			DatetimeEnd:   sql.NullTime{Time: endTime, Valid: true},
+			URL:           event.URL,
+			Location:      toNullString(location),
+			Typo3URL:      toNullString(event.URL),
+		}
+
+		if err := s.db.UpsertEvent(dbEvent); err != nil {
+			log.Printf("Failed to upsert Zetkin event %s: %v", event.Title, err)
+			continue
+		}
+		totalEvents++
+	}
+
+	log.Printf("Scraped %d events from Zetkin for site %s", totalEvents, site.ID)
+	return totalEvents
 }
 
 func (s *Scraper) fetchPage(url string) (string, error) {
