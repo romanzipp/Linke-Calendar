@@ -44,7 +44,7 @@ Zum Einbetten des Kalenders muss ein neuer Seitinhalt "Reines HTML" eingefügt w
 
 ![Anleitung](art/cms-01.png?v=2)
 
-Diese Maske sollte nun zu sehen sein:
+Diese Maske sollte nun zu sehen sein (HTML-Code Feld noch leer):
 
 ![Anleitung](art/cms-03.png?v=2)
 
@@ -83,7 +83,7 @@ Zum Einfügen der Termin-Liste muss ein neuer Seitinhalt "Reines HTML" eingefüg
 
 ![Anleitung](art/cms-01.png?v=2)
 
-Diese Maske sollte nun zu sehen sein:
+Diese Maske sollte nun zu sehen sein (HTML-Code Feld noch leer):
 
 ![Anleitung](art/cms-02.png?v=2)
 
