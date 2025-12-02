@@ -129,7 +129,7 @@ Im Repo liegt eine [docker-compose.yaml](docker-compose.yaml) Beispieldatei bei.
 - `GET /org/{org}/list` - List view showing all upcoming events in chronological order
   - Query params: `color` (optional)
 - `GET /org/{org}/ical` - iCal endpoint for subscribing with mobile device
-  - Query params: `title` (optional, sets the calendar name)
+  - Organization name is automatically fetched from Zetkin API and used as calendar title
 - `GET /event/{eventID}` - Event detail modal
 - `GET /static/*` - Static files (CSS, JS, fonts)
 

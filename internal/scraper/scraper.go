@@ -44,13 +44,14 @@ func (s *Scraper) ScrapeAll() error {
 func (s *Scraper) ScrapeOrganization(orgID int) error {
 	log.Printf("Scraping organization: %d", orgID)
 
+	totalEvents, orgTitle := s.scrapeZetkin(orgID)
+
 	if err := s.db.UpsertOrganization(&database.Organization{
-		ID: orgID,
+		ID:    orgID,
+		Title: toNullString(orgTitle),
 	}); err != nil {
 		return fmt.Errorf("failed to upsert organization: %w", err)
 	}
-
-	totalEvents := s.scrapeZetkin(orgID)
 
 	if err := s.db.UpdateOrganizationLastScraped(orgID, time.Now()); err != nil {
 		log.Printf("Failed to update last_scraped for organization %d: %v", orgID, err)
@@ -60,7 +61,7 @@ func (s *Scraper) ScrapeOrganization(orgID int) error {
 	return nil
 }
 
-func (s *Scraper) scrapeZetkin(orgID int) int {
+func (s *Scraper) scrapeZetkin(orgID int) (int, string) {
 	log.Printf("Fetching Zetkin events for organization ID: %d", orgID)
 
 	client := NewZetkinClient(orgID, s.config.GetScraperTimeout())
@@ -68,10 +69,15 @@ func (s *Scraper) scrapeZetkin(orgID int) int {
 	events, err := client.FetchAllEvents()
 	if err != nil {
 		log.Printf("Failed to fetch Zetkin events: %v", err)
-		return 0
+		return 0, ""
 	}
 
 	log.Printf("Fetched %d events from Zetkin for organization %d", len(events), orgID)
+
+	orgTitle := ""
+	if len(events) > 0 {
+		orgTitle = events[0].Organization.Title
+	}
 
 	totalEvents := 0
 	for _, event := range events {
@@ -124,7 +130,7 @@ func (s *Scraper) scrapeZetkin(orgID int) int {
 	}
 
 	log.Printf("Scraped %d events from Zetkin for organization %d", totalEvents, orgID)
-	return totalEvents
+	return totalEvents, orgTitle
 }
 
 func toNullString(s string) sql.NullString {

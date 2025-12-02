@@ -8,13 +8,14 @@ import (
 
 type Organization struct {
 	ID          int
+	Title       sql.NullString
 	LastScraped sql.NullTime
 	CreatedAt   time.Time
 }
 
 func (db *DB) CreateOrganization(org *Organization) error {
-	query := `INSERT INTO organizations (id) VALUES (?)`
-	_, err := db.Exec(query, org.ID)
+	query := `INSERT INTO organizations (id, title) VALUES (?, ?)`
+	_, err := db.Exec(query, org.ID, org.Title)
 	if err != nil {
 		return fmt.Errorf("failed to create organization: %w", err)
 	}
@@ -22,10 +23,11 @@ func (db *DB) CreateOrganization(org *Organization) error {
 }
 
 func (db *DB) GetOrganization(id int) (*Organization, error) {
-	query := `SELECT id, last_scraped, created_at FROM organizations WHERE id = ?`
+	query := `SELECT id, title, last_scraped, created_at FROM organizations WHERE id = ?`
 	var org Organization
 	err := db.QueryRow(query, id).Scan(
 		&org.ID,
+		&org.Title,
 		&org.LastScraped,
 		&org.CreatedAt,
 	)
@@ -36,7 +38,7 @@ func (db *DB) GetOrganization(id int) (*Organization, error) {
 }
 
 func (db *DB) GetAllOrganizations() ([]*Organization, error) {
-	query := `SELECT id, last_scraped, created_at FROM organizations ORDER BY id`
+	query := `SELECT id, title, last_scraped, created_at FROM organizations ORDER BY id`
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get organizations: %w", err)
@@ -48,6 +50,7 @@ func (db *DB) GetAllOrganizations() ([]*Organization, error) {
 		var org Organization
 		if err := rows.Scan(
 			&org.ID,
+			&org.Title,
 			&org.LastScraped,
 			&org.CreatedAt,
 		); err != nil {
@@ -90,12 +93,13 @@ func (db *DB) UpdateOrganizationLastScraped(id int, t time.Time) error {
 
 func (db *DB) UpsertOrganization(org *Organization) error {
 	query := `
-		INSERT INTO organizations (id)
-		VALUES (?)
+		INSERT INTO organizations (id, title)
+		VALUES (?, ?)
 		ON CONFLICT(id) DO UPDATE SET
+			title = excluded.title,
 			last_scraped = COALESCE(organizations.last_scraped, excluded.last_scraped)
 	`
-	_, err := db.Exec(query, org.ID)
+	_, err := db.Exec(query, org.ID, org.Title)
 	if err != nil {
 		return fmt.Errorf("failed to upsert organization: %w", err)
 	}

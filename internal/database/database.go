@@ -28,6 +28,7 @@ func (db *DB) Initialize() error {
 	schema := `
 	CREATE TABLE IF NOT EXISTS organizations (
 		id INTEGER PRIMARY KEY,
+		title TEXT,
 		last_scraped DATETIME,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
@@ -54,6 +55,11 @@ func (db *DB) Initialize() error {
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("failed to initialize schema: %w", err)
 	}
+
+	migrationSQL := `
+	ALTER TABLE organizations ADD COLUMN title TEXT;
+	`
+	db.Exec(migrationSQL)
 
 	return nil
 }

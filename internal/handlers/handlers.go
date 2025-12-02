@@ -95,22 +95,29 @@ func (h *Handler) Calendar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	org, err := h.db.GetOrganization(orgID)
+	if err != nil {
+		log.Printf("Failed to get organization %d: %v", orgID, err)
+	}
+
 	cal := calendar.Generate(year, month, events)
 
 	data := struct {
-		OrganizationID int
-		Calendar       *calendar.Month
-		Year           int
-		Month          int
-		PrevYear       int
-		PrevMonth      int
-		NextYear       int
-		NextMonth      int
+		OrganizationID    int
+		OrganizationTitle string
+		Calendar          *calendar.Month
+		Year              int
+		Month             int
+		PrevYear          int
+		PrevMonth         int
+		NextYear          int
+		NextMonth         int
 	}{
-		OrganizationID: orgID,
-		Calendar:       cal,
-		Year:           year,
-		Month:          int(month),
+		OrganizationID:    orgID,
+		OrganizationTitle: getOrganizationTitle(org),
+		Calendar:          cal,
+		Year:              year,
+		Month:             int(month),
 	}
 
 	prevMonth := month - 1
@@ -196,6 +203,11 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	org, err := h.db.GetOrganization(orgID)
+	if err != nil {
+		log.Printf("Failed to get organization %d: %v", orgID, err)
+	}
+
 	color := r.URL.Query().Get("color")
 
 	events, err := h.db.GetAllUpcomingEventsByOrganization(orgID)
@@ -206,13 +218,15 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		OrganizationID int
-		Events         []*database.Event
-		Color          string
+		OrganizationID    int
+		OrganizationTitle string
+		Events            []*database.Event
+		Color             string
 	}{
-		OrganizationID: orgID,
-		Events:         events,
-		Color:          color,
+		OrganizationID:    orgID,
+		OrganizationTitle: getOrganizationTitle(org),
+		Events:            events,
+		Color:             color,
 	}
 
 	if err := h.templates.ExecuteTemplate(w, "list.html", data); err != nil {
@@ -245,10 +259,12 @@ func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	title := r.URL.Query().Get("title")
-	if title == "" {
-		title = fmt.Sprintf("Organization %d", orgID)
+	org, err := h.db.GetOrganization(orgID)
+	if err != nil {
+		log.Printf("Failed to get organization %d: %v", orgID, err)
 	}
+
+	title := getOrganizationTitle(org)
 
 	events, err := h.db.GetEventsByOrganization(orgID)
 	if err != nil {
@@ -313,4 +329,14 @@ func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 
 func reinterpretTimeInLocation(t time.Time, loc *time.Location) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), loc)
+}
+
+func getOrganizationTitle(org *database.Organization) string {
+	if org != nil && org.Title.Valid {
+		return org.Title.String
+	}
+	if org != nil {
+		return fmt.Sprintf("Organization %d", org.ID)
+	}
+	return "Unknown Organization"
 }
