@@ -44,7 +44,7 @@ Zum Einbetten des Kalenders muss ein neuer Seitinhalt "Reines HTML" eingefügt w
 
 ![Anleitung](art/cms-01.png?v=2)
 
-In das "HTML-Code" Feld wird nun der folgende Code eingefügt. Stelle sicher, dass die URL in `src="..."` der korrekt erstellte Link für euren KV ist.
+Diese Maske sollte nun zu sehen sein:
 
 ![Anleitung](art/cms-03.png?v=2)
 
@@ -53,6 +53,8 @@ Die URL für den Kalender hat das folgende Format. Wie oben - ersetzt `<ORG>` mi
 ```
 https://linke-calendar.romanzipp.com/org/<ORG>/calendar
 ```
+
+In das "HTML-Code" Feld wird nun der folgende Code eingefügt. Stelle sicher, dass die URL in `src="..."` die korrekt erstellte URL für euren KV/LV ist.
 
 ```html
 <iframe id="calendar-embed"
@@ -81,7 +83,7 @@ Zum Einfügen der Termin-Liste muss ein neuer Seitinhalt "Reines HTML" eingefüg
 
 ![Anleitung](art/cms-01.png?v=2)
 
-In das "HTML-Code" Feld wird nun der folgende Code eingefügt. Stelle sicher, dass die URL in `src="..."` der korrekt erstellte Link für euren KV ist.
+Diese Maske sollte nun zu sehen sein:
 
 ![Anleitung](art/cms-02.png?v=2)
 
@@ -94,6 +96,8 @@ https://linke-calendar.romanzipp.com/org/<ORG>/list?color=white
 Es können zusätzliche URL Query-Parameter angehangen werden:
 
 - `color`: Farbe des Texts (verfügbar: `black`, `white`)
+
+In das "HTML-Code" Feld wird nun der folgende Code eingefügt. Stelle sicher, dass die URL in `src="..."` die korrekt erstellte URL für euren KV/LV ist.
 
 ```html
 <header class="card-header">
