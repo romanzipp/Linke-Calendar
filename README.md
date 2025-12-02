@@ -10,7 +10,7 @@ Ein Dienst, der Zetkin Termine als Kalender oder Liste im Typo3 "DAS LINKE CMS" 
 
 ![Vorschau](art/preview.jpg)
 
-Eine Live-Vorschau kann auf der Seite des [KV Fuldas](https://www.die-linke-fulda.de/termine/) eingesehen werden.
+Eine Live-Vorschau kann auf der Seite des [KV Fuldas](https://www.die-linke-fulda.de/termine/) eingesehen werden. Bei Rückfragen zur Integration [gerne kontaktieren](https://romanzipp.com).
 
 ## 1. Eure URL zusammenstellen
 
