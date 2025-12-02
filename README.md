@@ -119,7 +119,7 @@ Es können zusätzliche URL Query-Parameter angehangen werden:
 
 Der Server kann selbstverständlich auch selbst betrieben werden. Ein [fertiges Docker Image](https://github.com/romanzipp/Linke-Calendar/pkgs/container/linke-calendar) wird über GitHub bereitgestellt.
 
-Im Repo liegt eine [docker-compose.yaml](docker-compose.yaml) Beispieldatei bei.
+Im Repo liegt eine [docker-compose.yml](docker-compose.yml) Beispieldatei bei.
 
 ## API Endpoints
 
