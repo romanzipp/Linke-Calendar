@@ -51,3 +51,7 @@ func (s *Scheduler) Start() error {
 func (s *Scheduler) ScrapeNow() error {
 	return s.scraper.ScrapeAll()
 }
+
+func (s *Scheduler) GetScraper() *Scraper {
+	return s.scraper
+}

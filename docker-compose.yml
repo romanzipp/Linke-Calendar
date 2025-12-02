@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   calendar:
-    build: .
+    image: docker pull ghcr.io/romanzipp/linke-calendar:latest
     ports:
       - "8080:8080"
     volumes:

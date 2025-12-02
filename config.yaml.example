@@ -1,9 +1,3 @@
-sites:
-  - id: "fulda"
-    name: "Die Linke Fulda"
-    url: "https://www.die-linke-fulda.de/"
-    zetkin_organization: 192
-
 scraper:
   interval: "6h"
   timeout: "30s"

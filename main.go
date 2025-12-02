@@ -46,7 +46,7 @@ func main() {
 		log.Fatalf("Failed to start scraper scheduler: %v", err)
 	}
 
-	h, err := handlers.New(db, cfg)
+	h, err := handlers.New(db, scheduler.GetScraper())
 	if err != nil {
 		log.Fatalf("Failed to create handlers: %v", err)
 	}
@@ -58,9 +58,9 @@ func main() {
 	r.Use(middleware.Compress(5))
 
 	r.Get("/health", h.Health)
-	r.Get("/site/{siteID}/calendar", h.Calendar)
-	r.Get("/site/{siteID}/list", h.List)
-	r.Get("/site/{siteID}/ical", h.ICalendar)
+	r.Get("/org/{org}/calendar", h.Calendar)
+	r.Get("/org/{org}/list", h.List)
+	r.Get("/org/{org}/ical", h.ICalendar)
 	r.Get("/event/{eventID}", h.EventDetail)
 
 	fileServer := http.FileServer(http.Dir("web/static"))

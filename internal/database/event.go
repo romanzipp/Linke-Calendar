@@ -7,29 +7,29 @@ import (
 )
 
 type Event struct {
-	ID           int
-	SiteID       string
-	Title        string
-	Description  sql.NullString
-	DatetimeStart time.Time
-	DatetimeEnd  sql.NullTime
-	URL          string
-	Location     sql.NullString
-	Scraper      string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID             int
+	OrganizationID int
+	Title          string
+	Description    sql.NullString
+	DatetimeStart  time.Time
+	DatetimeEnd    sql.NullTime
+	URL            string
+	Location       sql.NullString
+	Scraper        string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 func (db *DB) CreateEvent(event *Event) error {
 	query := `
 		INSERT INTO events (
-			site_id, title, description, datetime_start, datetime_end,
+			organization_id, title, description, datetime_start, datetime_end,
 			url, location, scraper
 		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`
 	result, err := db.Exec(
 		query,
-		event.SiteID,
+		event.OrganizationID,
 		event.Title,
 		event.Description,
 		event.DatetimeStart,
@@ -53,14 +53,14 @@ func (db *DB) CreateEvent(event *Event) error {
 
 func (db *DB) GetEvent(id int) (*Event, error) {
 	query := `
-		SELECT id, site_id, title, description, datetime_start, datetime_end,
+		SELECT id, organization_id, title, description, datetime_start, datetime_end,
 		       url, location, scraper, created_at, updated_at
 		FROM events WHERE id = ?
 	`
 	var event Event
 	err := db.QueryRow(query, id).Scan(
 		&event.ID,
-		&event.SiteID,
+		&event.OrganizationID,
 		&event.Title,
 		&event.Description,
 		&event.DatetimeStart,
@@ -77,55 +77,55 @@ func (db *DB) GetEvent(id int) (*Event, error) {
 	return &event, nil
 }
 
-func (db *DB) GetEventsBySite(siteID string) ([]*Event, error) {
+func (db *DB) GetEventsByOrganization(orgID int) ([]*Event, error) {
 	query := `
-		SELECT id, site_id, title, description, datetime_start, datetime_end,
+		SELECT id, organization_id, title, description, datetime_start, datetime_end,
 		       url, location, scraper, created_at, updated_at
 		FROM events
-		WHERE site_id = ?
+		WHERE organization_id = ?
 		ORDER BY datetime_start ASC
 	`
-	return db.queryEvents(query, siteID)
+	return db.queryEvents(query, orgID)
 }
 
-func (db *DB) GetEventsBySiteInRange(siteID string, start, end time.Time) ([]*Event, error) {
+func (db *DB) GetEventsByOrganizationInRange(orgID int, start, end time.Time) ([]*Event, error) {
 	query := `
-		SELECT id, site_id, title, description, datetime_start, datetime_end,
+		SELECT id, organization_id, title, description, datetime_start, datetime_end,
 		       url, location, scraper, created_at, updated_at
 		FROM events
-		WHERE site_id = ? AND datetime_start >= ? AND datetime_start < ?
+		WHERE organization_id = ? AND datetime_start >= ? AND datetime_start < ?
 		ORDER BY datetime_start ASC
 	`
-	return db.queryEvents(query, siteID, start, end)
+	return db.queryEvents(query, orgID, start, end)
 }
 
-func (db *DB) GetUpcomingEventsBySite(siteID string, limit int) ([]*Event, error) {
+func (db *DB) GetUpcomingEventsByOrganization(orgID int, limit int) ([]*Event, error) {
 	query := `
-		SELECT id, site_id, title, description, datetime_start, datetime_end,
+		SELECT id, organization_id, title, description, datetime_start, datetime_end,
 		       url, location, scraper, created_at, updated_at
 		FROM events
-		WHERE site_id = ? AND datetime_start >= datetime('now')
+		WHERE organization_id = ? AND datetime_start >= datetime('now')
 		ORDER BY datetime_start ASC
 		LIMIT ?
 	`
-	return db.queryEvents(query, siteID, limit)
+	return db.queryEvents(query, orgID, limit)
 }
 
-func (db *DB) GetAllUpcomingEventsBySite(siteID string) ([]*Event, error) {
+func (db *DB) GetAllUpcomingEventsByOrganization(orgID int) ([]*Event, error) {
 	query := `
-		SELECT id, site_id, title, description, datetime_start, datetime_end,
+		SELECT id, organization_id, title, description, datetime_start, datetime_end,
 		       url, location, scraper, created_at, updated_at
 		FROM events
-		WHERE site_id = ? AND datetime_start >= datetime('now')
+		WHERE organization_id = ? AND datetime_start >= datetime('now')
 		ORDER BY datetime_start ASC
 	`
-	return db.queryEvents(query, siteID)
+	return db.queryEvents(query, orgID)
 }
 
 func (db *DB) UpsertEvent(event *Event) error {
 	query := `
 		INSERT INTO events (
-			site_id, title, description, datetime_start, datetime_end,
+			organization_id, title, description, datetime_start, datetime_end,
 			url, location, scraper
 		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(url) DO UPDATE SET
@@ -139,7 +139,7 @@ func (db *DB) UpsertEvent(event *Event) error {
 	`
 	_, err := db.Exec(
 		query,
-		event.SiteID,
+		event.OrganizationID,
 		event.Title,
 		event.Description,
 		event.DatetimeStart,
@@ -175,7 +175,7 @@ func (db *DB) queryEvents(query string, args ...interface{}) ([]*Event, error) {
 		var event Event
 		if err := rows.Scan(
 			&event.ID,
-			&event.SiteID,
+			&event.OrganizationID,
 			&event.Title,
 			&event.Description,
 			&event.DatetimeStart,

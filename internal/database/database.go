@@ -26,17 +26,15 @@ func New(path string) (*DB, error) {
 
 func (db *DB) Initialize() error {
 	schema := `
-	CREATE TABLE IF NOT EXISTS sites (
-		id TEXT PRIMARY KEY,
-		name TEXT NOT NULL,
-		url TEXT NOT NULL,
+	CREATE TABLE IF NOT EXISTS organizations (
+		id INTEGER PRIMARY KEY,
 		last_scraped DATETIME,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 
 	CREATE TABLE IF NOT EXISTS events (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		site_id TEXT NOT NULL,
+		organization_id INTEGER NOT NULL,
 		title TEXT NOT NULL,
 		description TEXT,
 		datetime_start DATETIME NOT NULL,
@@ -46,21 +44,16 @@ func (db *DB) Initialize() error {
 		scraper TEXT DEFAULT 'website',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (site_id) REFERENCES sites(id)
+		FOREIGN KEY (organization_id) REFERENCES organizations(id)
 	);
 
-	CREATE INDEX IF NOT EXISTS idx_events_site_date ON events(site_id, datetime_start);
+	CREATE INDEX IF NOT EXISTS idx_events_org_date ON events(organization_id, datetime_start);
 	CREATE INDEX IF NOT EXISTS idx_events_date ON events(datetime_start);
 	`
 
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("failed to initialize schema: %w", err)
 	}
-
-	migrationSQL := `
-	ALTER TABLE events ADD COLUMN scraper TEXT DEFAULT 'website';
-	`
-	db.Exec(migrationSQL)
 
 	return nil
 }

@@ -11,17 +11,20 @@ import (
 	ics "github.com/arran4/golang-ical"
 	"github.com/go-chi/chi/v5"
 	"github.com/romanzipp/linke-calendar/internal/calendar"
-	"github.com/romanzipp/linke-calendar/internal/config"
 	"github.com/romanzipp/linke-calendar/internal/database"
 )
 
+type Scraper interface {
+	ScrapeOrganization(orgID int) error
+}
+
 type Handler struct {
 	db        *database.DB
-	config    *config.Config
+	scraper   Scraper
 	templates *template.Template
 }
 
-func New(db *database.DB, cfg *config.Config) (*Handler, error) {
+func New(db *database.DB, scraper Scraper) (*Handler, error) {
 	tmpl, err := template.ParseGlob("web/templates/*.html")
 	if err != nil {
 		return nil, err
@@ -29,7 +32,7 @@ func New(db *database.DB, cfg *config.Config) (*Handler, error) {
 
 	return &Handler{
 		db:        db,
-		config:    cfg,
+		scraper:   scraper,
 		templates: tmpl,
 	}, nil
 }
@@ -40,7 +43,28 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Calendar(w http.ResponseWriter, r *http.Request) {
-	siteID := chi.URLParam(r, "siteID")
+	orgStr := chi.URLParam(r, "org")
+	orgID, err := strconv.Atoi(orgStr)
+	if err != nil {
+		http.Error(w, "Invalid organization ID", http.StatusBadRequest)
+		return
+	}
+
+	hasEvents, err := h.db.HasEventsForOrganization(orgID)
+	if err != nil {
+		log.Printf("Failed to check events for organization %d: %v", orgID, err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if !hasEvents {
+		log.Printf("No events for organization %d, scraping synchronously", orgID)
+		if err := h.scraper.ScrapeOrganization(orgID); err != nil {
+			log.Printf("Failed to scrape organization %d: %v", orgID, err)
+			http.Error(w, "Failed to fetch events", http.StatusInternalServerError)
+			return
+		}
+	}
 
 	yearStr := r.URL.Query().Get("year")
 	monthStr := r.URL.Query().Get("month")
@@ -61,17 +85,10 @@ func (h *Handler) Calendar(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	site, err := h.db.GetSite(siteID)
-	if err != nil {
-		log.Printf("Failed to get site %s: %v", siteID, err)
-		http.Error(w, "Site not found", http.StatusNotFound)
-		return
-	}
-
 	startDate := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 	endDate := startDate.AddDate(0, 1, 0)
 
-	events, err := h.db.GetEventsBySiteInRange(siteID, startDate, endDate)
+	events, err := h.db.GetEventsByOrganizationInRange(orgID, startDate, endDate)
 	if err != nil {
 		log.Printf("Failed to get events: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -81,19 +98,19 @@ func (h *Handler) Calendar(w http.ResponseWriter, r *http.Request) {
 	cal := calendar.Generate(year, month, events)
 
 	data := struct {
-		Site     *database.Site
-		Calendar *calendar.Month
-		Year     int
-		Month    int
-		PrevYear int
-		PrevMonth int
-		NextYear int
-		NextMonth int
+		OrganizationID int
+		Calendar       *calendar.Month
+		Year           int
+		Month          int
+		PrevYear       int
+		PrevMonth      int
+		NextYear       int
+		NextMonth      int
 	}{
-		Site:     site,
-		Calendar: cal,
-		Year:     year,
-		Month:    int(month),
+		OrganizationID: orgID,
+		Calendar:       cal,
+		Year:           year,
+		Month:          int(month),
 	}
 
 	prevMonth := month - 1
@@ -156,17 +173,32 @@ func (h *Handler) EventDetail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
-	siteID := chi.URLParam(r, "siteID")
-	color := r.URL.Query().Get("color")
-
-	site, err := h.db.GetSite(siteID)
+	orgStr := chi.URLParam(r, "org")
+	orgID, err := strconv.Atoi(orgStr)
 	if err != nil {
-		log.Printf("Failed to get site %s: %v", siteID, err)
-		http.Error(w, "Site not found", http.StatusNotFound)
+		http.Error(w, "Invalid organization ID", http.StatusBadRequest)
 		return
 	}
 
-	events, err := h.db.GetAllUpcomingEventsBySite(siteID)
+	hasEvents, err := h.db.HasEventsForOrganization(orgID)
+	if err != nil {
+		log.Printf("Failed to check events for organization %d: %v", orgID, err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if !hasEvents {
+		log.Printf("No events for organization %d, scraping synchronously", orgID)
+		if err := h.scraper.ScrapeOrganization(orgID); err != nil {
+			log.Printf("Failed to scrape organization %d: %v", orgID, err)
+			http.Error(w, "Failed to fetch events", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	color := r.URL.Query().Get("color")
+
+	events, err := h.db.GetAllUpcomingEventsByOrganization(orgID)
 	if err != nil {
 		log.Printf("Failed to get upcoming events: %v", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -174,13 +206,13 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Site   *database.Site
-		Events []*database.Event
-		Color  string
+		OrganizationID int
+		Events         []*database.Event
+		Color          string
 	}{
-		Site:   site,
-		Events: events,
-		Color:  color,
+		OrganizationID: orgID,
+		Events:         events,
+		Color:          color,
 	}
 
 	if err := h.templates.ExecuteTemplate(w, "list.html", data); err != nil {
@@ -190,18 +222,37 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
-	siteID := chi.URLParam(r, "siteID")
-
-	site, err := h.db.GetSite(siteID)
+	orgStr := chi.URLParam(r, "org")
+	orgID, err := strconv.Atoi(orgStr)
 	if err != nil {
-		log.Printf("Failed to get site %s: %v", siteID, err)
-		http.Error(w, "Site not found", http.StatusNotFound)
+		http.Error(w, "Invalid organization ID", http.StatusBadRequest)
 		return
 	}
 
-	events, err := h.db.GetEventsBySite(siteID)
+	hasEvents, err := h.db.HasEventsForOrganization(orgID)
 	if err != nil {
-		log.Printf("Failed to get events for site %s: %v", siteID, err)
+		log.Printf("Failed to check events for organization %d: %v", orgID, err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if !hasEvents {
+		log.Printf("No events for organization %d, scraping synchronously", orgID)
+		if err := h.scraper.ScrapeOrganization(orgID); err != nil {
+			log.Printf("Failed to scrape organization %d: %v", orgID, err)
+			http.Error(w, "Failed to fetch events", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	title := r.URL.Query().Get("title")
+	if title == "" {
+		title = fmt.Sprintf("Organization %d", orgID)
+	}
+
+	events, err := h.db.GetEventsByOrganization(orgID)
+	if err != nil {
+		log.Printf("Failed to get events for organization %d: %v", orgID, err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -214,13 +265,13 @@ func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 
 	cal := ics.NewCalendar()
 	cal.SetMethod(ics.MethodPublish)
-	cal.SetName(site.Name)
-	cal.SetDescription(fmt.Sprintf("Events calendar for %s", site.Name))
+	cal.SetName(title)
+	cal.SetDescription(fmt.Sprintf("Events calendar for %s", title))
 	cal.SetXPublishedTTL("PT1H")
 	cal.SetTimezoneId("Europe/Berlin")
 
 	for _, event := range events {
-		icalEvent := cal.AddEvent(fmt.Sprintf("%s-%d@linke-calendar", siteID, event.ID))
+		icalEvent := cal.AddEvent(fmt.Sprintf("%d-%d@linke-calendar", orgID, event.ID))
 		icalEvent.SetCreatedTime(event.CreatedAt)
 		icalEvent.SetModifiedAt(event.UpdatedAt)
 		icalEvent.SetStartAt(reinterpretTimeInLocation(event.DatetimeStart, berlin))
@@ -252,7 +303,7 @@ func (h *Handler) ICalendar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/calendar; charset=utf-8")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.ics\"", siteID))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%d.ics\"", orgID))
 
 	if err := cal.SerializeTo(w); err != nil {
 		log.Printf("Failed to serialize iCal: %v", err)

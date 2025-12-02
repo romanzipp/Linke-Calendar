@@ -115,27 +115,29 @@ Es können zusätzliche URL Query-Parameter angehangen werden:
 </div>
 ```
 
+## Self-Hosted
+
+Der Server kann selbstverständlich auch selbst betrieben werden. Ein fertiges Docker Image wird über GitHub bereitgestellt: `https://github.com/romanzipp/Linke-Calendar/pkgs/container/linke-calendar`.
+
+Im Repo liegt eine [docker-compose.yaml](docker-compose.yaml) Beispieldatei bei.
+
 ## API Endpoints
 
 - `GET /health` - Health check endpoint
-- `GET /site/{siteID}/calendar` - Calendar view for a specific site
+- `GET /org/{org}/calendar` - Calendar view for a specific organization
   - Query params: `year`, `month` (optional)
-- `GET /site/{siteID}/list` - List view showing all upcoming events in chronological order
-- `GET /site/{siteID}/ical` - iCal endpoint for subscribing with mobile device
+- `GET /org/{org}/list` - List view showing all upcoming events in chronological order
+  - Query params: `color` (optional)
+- `GET /org/{org}/ical` - iCal endpoint for subscribing with mobile device
+  - Query params: `title` (optional, sets the calendar name)
 - `GET /event/{eventID}` - Event detail modal
 - `GET /static/*` - Static files (CSS, JS, fonts)
 
 ## Configuration
 
-Create a `config.yaml` file based on `config.yaml.example`:
+Create a `config.yaml` file:
 
 ```yaml
-sites:
-  - id: "fulda"
-    name: "Die Linke Fulda"
-    url: "https://www.die-linke-fulda.de/"
-    zetkin_organization: 192
-
 scraper:
   interval: "6h"
   timeout: "30s"
@@ -144,6 +146,8 @@ server:
   port: "8080"
   host: "0.0.0.0"
 ```
+
+Organizations are automatically discovered when first accessed via the URL. The scraper will then periodically update events for all organizations that have been accessed.
 
 ## License
 
