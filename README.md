@@ -117,7 +117,7 @@ Es können zusätzliche URL Query-Parameter angehangen werden:
 
 ## Self-Hosted
 
-Der Server kann selbstverständlich auch selbst betrieben werden. Ein fertiges Docker Image wird über GitHub bereitgestellt: `https://github.com/romanzipp/Linke-Calendar/pkgs/container/linke-calendar`.
+Der Server kann selbstverständlich auch selbst betrieben werden. Ein [fertiges Docker Image](https://github.com/romanzipp/Linke-Calendar/pkgs/container/linke-calendar) wird über GitHub bereitgestellt.
 
 Im Repo liegt eine [docker-compose.yaml](docker-compose.yaml) Beispieldatei bei.
 
