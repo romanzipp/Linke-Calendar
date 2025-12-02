@@ -27,7 +27,7 @@ Dafür musst ihr zuerst eure **Zetkin Organisations-ID** rausfinden.
 
 ### Die URL
 
-Ersetzt nun den Platzhalter `<ORG>` mit der vorher ausgelesenen Organisations-ID:
+Ersetzt nun den Platzhalter `<ORG>` mit der vorher ausgelesenen Organisations-ID. Die URLs braucht ihr gleich.
 
 ```
 https://linke-calendar.romanzipp.com/org/<ORG>/calendar
