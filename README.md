@@ -1,11 +1,11 @@
 # Linke Calendar
 
-Ein Go Webserver, der Termine von Zetkin scraped und als `<iframe>` einbettbare Seite bereitstellt.
+Ein Dienst, der Zetkin Termine als Kalender oder Liste im Typo3 "DAS LINKE CMS" einbettet.
 
 ## Funktionen
 
-- Anbindung an Zetkin inklusive Filterung nach KV/LV ("Organisation")
-- Einbettung des Kalenders via `<iframe>` in die Website
+- Abrufen aller Termine aus Zetkin für euren KV/LV
+- Einbettung der Termine als Kalender oder Liste via `<iframe>` in die Website
 - Stellt iCal-Link zur Verfügung, womit der Kalender in mobilen Kalender-Apps abonniert werden kann
 
 ![Vorschau](art/preview.jpg)
@@ -114,6 +114,23 @@ Es können zusätzliche URL Query-Parameter angehangen werden:
   </a>
 </div>
 ```
+
+## 3. iCal-Endpunkt
+
+Der Dienst erlaubt es euch auch, einen Link herauszugeben, welcher in allen gänigen Kalender-Apps (Google, Apple Kalender, Thunderbird, etc.) "abonniert" werden kann.
+Damit landen alle Zetkin Termine automatisch im Kalender eurer Smartphones oder Computer.
+
+Hier - wie zuvor aus - das `<ORG>` gegen eure Organisations-ID austauschen. Der Link kann dann auf eurer Website ausgegeben werden.
+
+```
+https://linke-calendar.romanzipp.com/org/<ORG>/ical
+```
+
+- [Anleitung für Apple iPhone](https://support.apple.com/de-de/102301)
+- [Anleitung für Google Kalender](https://support.google.com/calendar/answer/37100?hl=de&co=GENIE.Platform%3DDesktop) ("Öffentlichen Kalender über einen Link hinzufügen")
+- [Anleitung für Thunderbird](https://ffw-saltendorf-boesenbechhofen.de/termine/kalender-abonnieren/thunderbird/)
+
+![iCal Integration](art/cal.png)
 
 ## Self-Hosted
 
