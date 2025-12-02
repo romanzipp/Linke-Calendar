@@ -23,7 +23,7 @@ Dafür musst ihr zuerst eure **Zetkin Organisations-ID** rausfinden.
 1. In Zetkin einloggen und das [Dashboard](https://www.zetkin.die-linke.de/dashboard/organizations) aufrufen.
 2. Den gewünschten KV/LV anklicken. (hier z.B. "KV Fulda")
 3. Die aufgerufene Browser-Adresse hat folgendes Schema: `https://www.zetkin.die-linke.de/o/192/`
-    Hier endet die Adresse mit der Zahl `192` - also ist eure Zetkin Organisations-ID die `192`
+    - Hier endet die Adresse mit der Zahl `192` - also ist eure Zetkin Organisations-ID die `192`
 
 ### Die URL
 
