@@ -127,7 +127,7 @@ In das "HTML-Code" Feld wird nun der folgende Code eingefügt. Stelle sicher, da
 Der Dienst erlaubt es euch auch, einen Link herauszugeben, welcher in allen gänigen Kalender-Apps (Google, Apple Kalender, Thunderbird, etc.) "abonniert" werden kann.
 Damit landen alle Zetkin Termine automatisch im Kalender eurer Smartphones oder Computer.
 
-Hier - wie zuvor aus - das `<ORG>` gegen eure Organisations-ID austauschen. Der Link kann dann auf eurer Website ausgegeben werden.
+Hier - wie zuvor auch - das `<ORG>` gegen eure Organisations-ID austauschen. Der Link kann dann auf eurer Website ausgegeben werden.
 
 ```
 https://linke-calendar.romanzipp.com/org/<ORG>/ical
