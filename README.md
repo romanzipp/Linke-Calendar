@@ -38,6 +38,8 @@ https://linke-calendar.romanzipp.com/org/<ORG>/list
 
 Die verfügbaren Komponenten (Kalender & Termin-Liste) werden per `iframe` eingebettet. Selbst werden sie auf einem anderen Server bereitgestellt und nur im CMS "referenziert".
 
+Ich biete das kostenfreie Hosting des Kalenders an und jede:r ist frei, diesen Dienst zu nutzen. Beachtet, dass Aufrufe auf den Kalender/Termine-Liste/iCal-Endpunkt meinen Server erreichen. Es werden keine Daten außer den öffentlich einsehbaren Zetkin Terminen gespeichert. Server-Zugrifflogs liegen im RAM und werden konstant überschrieben (mehr in meiner [Datenschutzerklärung](https://romanzipp.com/datenschutzerklaerung)). Natürlich steht es euch frei, dieses quellofene Projekt selbst zu betreiben.
+
 ### Kalender
 
 Zum Einbetten des Kalenders muss ein neuer Seitinhalt "Reines HTML" eingefügt werden.
