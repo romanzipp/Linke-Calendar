@@ -56,6 +56,12 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Compress(5))
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("X-Robots-Tag", "noindex")
+			next.ServeHTTP(w, r)
+		})
+	})
 
 	r.Get("/health", h.Health)
 	r.Get("/org/{org}/calendar", h.Calendar)
