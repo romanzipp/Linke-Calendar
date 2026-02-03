@@ -32,7 +32,7 @@ func Generate(year int, month time.Month, events []*database.Event) *Month {
 	cal := &Month{
 		Year:      year,
 		Month:     month,
-		MonthName: month.String(),
+		MonthName: getGermanMonthName(month),
 		Weeks:     make([]Week, 0),
 	}
 
@@ -95,6 +95,24 @@ func Generate(year int, month time.Month, events []*database.Event) *Month {
 	}
 
 	return cal
+}
+
+func getGermanMonthName(month time.Month) string {
+	germanMonths := map[time.Month]string{
+		time.January:   "Januar",
+		time.February:  "Februar",
+		time.March:     "März",
+		time.April:     "April",
+		time.May:       "Mai",
+		time.June:      "Juni",
+		time.July:      "Juli",
+		time.August:    "August",
+		time.September: "September",
+		time.October:   "Oktober",
+		time.November:  "November",
+		time.December:  "Dezember",
+	}
+	return germanMonths[month]
 }
 
 func groupEventsByDate(events []*database.Event) map[string][]*database.Event {
