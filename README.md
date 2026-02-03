@@ -145,6 +145,23 @@ Der Server kann selbstverständlich auch selbst betrieben werden. Ein [fertiges 
 
 Im Repo liegt eine [docker-compose.yml](docker-compose.yml) Beispieldatei bei.
 
+## Development
+
+Start go development server (<http://localhost:8080>):
+
+```bash
+go run .
+
+# with gow utility
+gow -e=go,html run .
+```
+
+Build frontend assets & listen for changes:
+
+```bash
+npm run watch:css
+```
+
 ## API Endpoints
 
 - `GET /health` - Health check endpoint
