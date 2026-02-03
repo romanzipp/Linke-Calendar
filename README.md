@@ -63,7 +63,7 @@ In das "HTML-Code" Feld wird nun der folgende Code eingefügt. Stelle sicher, da
 <iframe id="calendar-embed"
         src="https://linke-calendar.romanzipp.com/org/<ORG>/calendar" 
         width="100%" 
-        height="700" 
+        height="930" 
         scrolling="no"></iframe>
 
 <style>
