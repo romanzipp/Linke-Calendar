@@ -22,9 +22,10 @@ type Handler struct {
 	db        *database.DB
 	scraper   Scraper
 	templates *template.Template
+	version   string
 }
 
-func New(db *database.DB, scraper Scraper) (*Handler, error) {
+func New(db *database.DB, scraper Scraper, version string) (*Handler, error) {
 	tmpl, err := template.ParseGlob("web/templates/*.html")
 	if err != nil {
 		return nil, err
@@ -34,6 +35,7 @@ func New(db *database.DB, scraper Scraper) (*Handler, error) {
 		db:        db,
 		scraper:   scraper,
 		templates: tmpl,
+		version:   version,
 	}, nil
 }
 
@@ -112,12 +114,14 @@ func (h *Handler) Calendar(w http.ResponseWriter, r *http.Request) {
 		PrevMonth         int
 		NextYear          int
 		NextMonth         int
+		Version           string
 	}{
 		OrganizationID:    orgID,
 		OrganizationTitle: getOrganizationTitle(org),
 		Calendar:          cal,
 		Year:              year,
 		Month:             int(month),
+		Version:           h.version,
 	}
 
 	prevMonth := month - 1
@@ -222,11 +226,13 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 		OrganizationTitle string
 		Events            []*database.Event
 		Color             string
+		Version           string
 	}{
 		OrganizationID:    orgID,
 		OrganizationTitle: getOrganizationTitle(org),
 		Events:            events,
 		Color:             color,
+		Version:           h.version,
 	}
 
 	if err := h.templates.ExecuteTemplate(w, "list.html", data); err != nil {

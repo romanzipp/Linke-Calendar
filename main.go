@@ -15,6 +15,8 @@ import (
 	"github.com/romanzipp/linke-calendar/internal/scraper"
 )
 
+var Version = "dev"
+
 func main() {
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
@@ -46,7 +48,7 @@ func main() {
 		log.Fatalf("Failed to start scraper scheduler: %v", err)
 	}
 
-	h, err := handlers.New(db, scheduler.GetScraper())
+	h, err := handlers.New(db, scheduler.GetScraper(), Version)
 	if err != nil {
 		log.Fatalf("Failed to create handlers: %v", err)
 	}

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <title>{{.OrganizationTitle}} - Termine</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=0.1.11">
+    <link rel="stylesheet" href="/static/css/style.css{{if ne .Version "dev"}}?v={{.Version}}{{end}}">
 </head>
 <body class="bg-transparent">
     <div class="w-full mx-auto{{if eq .Color "white"}} text-white{{end}}">
