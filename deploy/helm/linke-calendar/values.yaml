@@ -22,14 +22,14 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     haproxy.org/ssl-redirect: "true"
   hosts:
-    - host: linke-calendar-v2.romanzipp.com
+    - host: linke-calendar.romanzipp.com
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: linke-calendar-v2-tls
+    - secretName: linke-calendar-tls
       hosts:
-        - linke-calendar-v2.romanzipp.com
+        - linke-calendar.romanzipp.com
 
 persistence:
   enabled: true
