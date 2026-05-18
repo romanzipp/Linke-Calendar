@@ -49,6 +49,7 @@ resources:
 # config.yaml contents — rendered into a ConfigMap and mounted at /app/config.yaml.
 config:
   scraper:
+    max_pages: 10
     interval: "6h"
     timeout: "30s"
   server:
