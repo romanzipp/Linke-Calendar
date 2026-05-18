@@ -1,5 +1,8 @@
 # Linke Calendar
 
+> [!NOTE]
+> Dieses Projekt wird ab sofort ausschließlich auf [Codeberg](https://codeberg.org/romanzipp/linke-calendar) entwickelt. Das [GitHub-Repository](https://github.com/romanzipp/Linke-Calendar-Mirror) dient nur noch als Read-only-Mirror.
+
 Ein Dienst, der Zetkin Termine als Kalender oder Liste im Typo3 "DAS LINKE CMS" einbettet.
 
 ## Funktionen
