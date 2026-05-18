@@ -1,0 +1,70 @@
+image:
+  repository: registry.apex.romanzipp.cloud/linke-calendar-image
+  pullPolicy: IfNotPresent
+  # Defaults to .Chart.AppVersion (== the git tag the chart was packaged from).
+  tag: ""
+
+# Keep K8s resource names as `linke-calendar` even though the chart is `linke-calendar-chart`.
+fullnameOverride: linke-calendar
+
+imagePullSecrets:
+  - name: image-pull
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: haproxy
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    haproxy.org/ssl-redirect: "true"
+  hosts:
+    - host: linke-calendar-v2.romanzipp.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: linke-calendar-v2-tls
+      hosts:
+        - linke-calendar-v2.romanzipp.com
+
+persistence:
+  enabled: true
+  storageClass: ""
+  size: 1Gi
+  # SQLite scrape cache. ReadWriteOnce + Recreate is intentional (single replica).
+  accessMode: ReadWriteOnce
+  mountPath: /app/data
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 256Mi
+
+# config.yaml contents — rendered into a ConfigMap and mounted at /app/config.yaml.
+config:
+  scraper:
+    interval: "6h"
+    timeout: "30s"
+  server:
+    port: "8080"
+    host: "0.0.0.0"
+
+probes:
+  liveness:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  readiness:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 2
+    periodSeconds: 5

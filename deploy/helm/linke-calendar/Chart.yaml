@@ -1,0 +1,7 @@
+apiVersion: v2
+name: linke-calendar-chart
+description: linke-calendar — Go service scraping Zetkin events and serving an embeddable calendar
+type: application
+# version and appVersion are overwritten at package time by the release workflow.
+version: 0.0.0
+appVersion: "0.0.0"
