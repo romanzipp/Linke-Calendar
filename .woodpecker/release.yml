@@ -13,6 +13,8 @@ when:
 #   registry_token         registry login token
 #   argocd_server
 #   argocd_auth_token      argocd API token
+#   argocd_app_name        argocd Application name
+#   argocd_app_namespace   k8s namespace the app deploys into
 
 variables:
   - &step_resources
@@ -73,19 +75,23 @@ steps:
         from_secret: argocd_server
       ARGOCD_AUTH_TOKEN:
         from_secret: argocd_auth_token
+      ARGOCD_APP_NAME:
+        from_secret: argocd_app_name
+      ARGOCD_APP_NAMESPACE:
+        from_secret: argocd_app_namespace
     commands:
       # Create-or-update the Application. The OCI Helm repo
       # ($CONTAINER_REGISTRY) must already be registered with credentials
       # in Argo CD.
       - |
-        argocd app create linke-calendar \
+        argocd app create "$ARGOCD_APP_NAME" \
           --upsert \
           --repo "$CONTAINER_REGISTRY" \
           --helm-chart linke-calendar-chart \
           --revision "$CI_COMMIT_TAG" \
           --dest-server https://kubernetes.default.svc \
-          --dest-namespace linke-calendar \
-          --project default \
+          --dest-namespace "$ARGOCD_APP_NAMESPACE" \
+          --project public \
           --release-name linke-calendar \
           --sync-policy automated \
           --self-heal \
@@ -94,9 +100,9 @@ steps:
           --server "$ARGOCD_SERVER" --grpc-web
       # `app create --upsert` may have already triggered an automated sync.
       # Wait for any in-flight op before issuing our own sync.
-      - argocd app wait linke-calendar --server "$ARGOCD_SERVER" --grpc-web
+      - argocd app wait "$ARGOCD_APP_NAME" --server "$ARGOCD_SERVER" --grpc-web
         --operation --timeout 600
-      - argocd app sync linke-calendar --server "$ARGOCD_SERVER" --grpc-web
+      - argocd app sync "$ARGOCD_APP_NAME" --server "$ARGOCD_SERVER" --grpc-web
         --timeout 600
-      - argocd app wait linke-calendar --server "$ARGOCD_SERVER" --grpc-web
+      - argocd app wait "$ARGOCD_APP_NAME" --server "$ARGOCD_SERVER" --grpc-web
         --health --timeout 600
