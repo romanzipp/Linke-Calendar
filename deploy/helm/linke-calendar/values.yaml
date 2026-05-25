@@ -7,29 +7,39 @@ image:
 # Keep K8s resource names as `linke-calendar` even though the chart is `linke-calendar-chart`.
 fullnameOverride: linke-calendar
 
-imagePullSecrets:
-  - name: image-pull
+# Cluster-specific image pull credentials. Populated from apex.
+#   imagePullSecrets:
+#     - name: image-pull
+imagePullSecrets: []
 
 service:
   type: ClusterIP
   port: 80
   targetPort: 8080
 
+# Ingress is opt-in. Cluster-specific values (className, annotations,
+# hosts, TLS) live in the apex Argo Application's helm.values. Example:
+#   ingress:
+#     enabled: true
+#     className: haproxy
+#     annotations:
+#       cert-manager.io/cluster-issuer: letsencrypt-prod
+#       haproxy.org/ssl-redirect: "true"
+#     hosts:
+#       - host: linke-calendar.example.com
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#     tls:
+#       - secretName: linke-calendar-tls
+#         hosts:
+#           - linke-calendar.example.com
 ingress:
-  enabled: true
-  className: haproxy
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    haproxy.org/ssl-redirect: "true"
-  hosts:
-    - host: linke-calendar.romanzipp.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: linke-calendar-tls
-      hosts:
-        - linke-calendar.romanzipp.com
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []
 
 persistence:
   enabled: true
