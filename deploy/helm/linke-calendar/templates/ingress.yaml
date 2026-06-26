@@ -1,24 +1,26 @@
 {{- if .Values.ingress.enabled -}}
+{{- range $g := .Values.ingress.groups }}
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "linke-calendar.fullname" . }}
+  name: {{ include "linke-calendar.fullname" $ }}-{{ $g.name }}
   labels:
-    {{- include "linke-calendar.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+    {{- include "linke-calendar.labels" $ | nindent 4 }}
+  {{- with $g.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.ingress.className }}
+  {{- with $.Values.ingress.className }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- with .Values.ingress.tls }}
+  {{- with $g.tls }}
   tls:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range $g.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
@@ -32,4 +34,5 @@ spec:
                   name: http
           {{- end }}
     {{- end }}
+{{- end }}
 {{- end }}

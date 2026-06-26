@@ -17,29 +17,31 @@ service:
   port: 80
   targetPort: 8080
 
-# Ingress is opt-in. Cluster-specific values (className, annotations,
-# hosts, TLS) live in the apex Argo Application's helm.values. Example:
+# Ingress is opt-in. Each group renders its own Ingress resource, so each can
+# carry its own annotations (e.g. a per-domain cert-manager issuer — required
+# when domains live in different DNS zones/ACME solvers). Cluster-specific
+# values live in the apex Argo Application's helm.values. Example:
 #   ingress:
 #     enabled: true
 #     className: haproxy
-#     annotations:
-#       cert-manager.io/cluster-issuer: letsencrypt-prod
-#       haproxy.org/ssl-redirect: "true"
-#     hosts:
-#       - host: linke-calendar.example.com
-#         paths:
-#           - path: /
-#             pathType: Prefix
-#     tls:
-#       - secretName: linke-calendar-tls
+#     groups:
+#       - name: romanzipp
+#         annotations:
+#           cert-manager.io/cluster-issuer: letsencrypt-prod
+#           haproxy.org/ssl-redirect: "true"
 #         hosts:
-#           - linke-calendar.example.com
+#           - host: linke-calendar.example.com
+#             paths:
+#               - path: /
+#                 pathType: Prefix
+#         tls:
+#           - secretName: linke-calendar-tls
+#             hosts:
+#               - linke-calendar.example.com
 ingress:
   enabled: false
   className: ""
-  annotations: {}
-  hosts: []
-  tls: []
+  groups: []
 
 persistence:
   enabled: true
