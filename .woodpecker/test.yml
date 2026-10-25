@@ -15,7 +15,7 @@ variables:
 
 steps:
   - name: vet
-    image: golang:1.25-alpine
+    image: golang:1.27-alpine
     <<: *step_resources
     environment:
       CGO_ENABLED: "1"
@@ -24,7 +24,7 @@ steps:
       - go vet ./...
 
   - name: test
-    image: golang:1.25-alpine
+    image: golang:1.27-alpine
     <<: *step_resources
     environment:
       CGO_ENABLED: "1"
