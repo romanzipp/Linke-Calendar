@@ -8,7 +8,7 @@
     "postinstall": "cp node_modules/htmx.org/dist/htmx.min.js web/static/js/"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^4.0.0"
   },
   "dependencies": {
     "htmx.org": "^1.9.10"
