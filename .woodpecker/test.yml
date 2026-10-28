@@ -33,7 +33,7 @@ steps:
       - go test -count=1 ./...
 
   - name: assets
-    image: node:22-alpine
+    image: node:26-alpine
     <<: *step_resources
     commands:
       - npm ci
