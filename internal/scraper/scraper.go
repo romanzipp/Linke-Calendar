@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"slices"
 	"time"
 
 	"github.com/romanzipp/linke-calendar/internal/config"
@@ -80,6 +81,7 @@ func (s *Scraper) scrapeZetkin(orgID int) (int, string) {
 	}
 
 	totalEvents := 0
+	upcomingEventsToDelete, err := s.db.GetAllUpcomingEventsByOrganization(orgID)
 	for _, event := range events {
 		startTime, err := parseZetkinTime(event.StartTime)
 		if err != nil {
@@ -111,6 +113,10 @@ func (s *Scraper) scrapeZetkin(orgID int) (int, string) {
 
 		eventURL := fmt.Sprintf("https://app.zetkin.die-linke.de/o/%d/events/%d", event.Organization.ID, event.ID)
 
+		upcomingEventsToDelete = slices.DeleteFunc(upcomingEventsToDelete, func(event *database.Event) bool {
+			return event.URL == eventURL
+		})
+
 		dbEvent := &database.Event{
 			OrganizationID: orgID,
 			Title:          event.Title,
@@ -128,8 +134,12 @@ func (s *Scraper) scrapeZetkin(orgID int) (int, string) {
 		}
 		totalEvents++
 	}
+	s.db.DeleteEvents(upcomingEventsToDelete)
 
 	log.Printf("Scraped %d events from Zetkin for organization %d", totalEvents, orgID)
+	if len(upcomingEventsToDelete) > 0 {
+		log.Printf("Deleted %d upcoming events for organization %d, as they were not included in most recent scrape and have probably been cancelled or deleted in Zetkin", len(upcomingEventsToDelete), orgID)
+	}
 	return totalEvents, orgTitle
 }
 

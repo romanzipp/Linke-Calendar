@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -152,6 +153,22 @@ func (db *DB) UpsertEvent(event *Event) error {
 		return fmt.Errorf("failed to upsert event: %w", err)
 	}
 	return nil
+}
+
+func (db *DB) DeleteEvents(events []*Event) error {
+	if len(events) == 0 {
+		return nil
+	}
+	ids := make([]any, len(events))
+	placeholders := make([]string, len(events))
+	for i, event := range events {
+		ids[i] = event.ID
+		placeholders[i] = "?"
+	}
+	query := fmt.Sprintf("DELETE FROM events WHERE id IN (%s)", strings.Join(placeholders, ","))
+
+	_, err := db.Exec(query, ids...)
+	return err
 }
 
 func (db *DB) DeleteOldEvents(before time.Time) error {
