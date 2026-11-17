@@ -32,7 +32,7 @@ steps:
         VERSION: ${CI_COMMIT_TAG}
 
   - name: package-and-push-chart
-    image: alpine/helm:4.3.1
+    image: alpine/helm:4.3.2
     <<: *step_resources
     environment:
       REGISTRY_USERNAME:
